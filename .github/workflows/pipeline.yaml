@@ -1,0 +1,40 @@
+name: deploy helm chart on secondary cluster
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: monitering-cluster
+  GKE_ZONE: asia-south1-a	
+  DEPLOYMENT_NAME: secondary-cluster-deployment
+  IMAGE: secondary-cluster-deployment-image
+
+jobs:
+  setup-helm-deploy
+     name: setup helm deploy
+     runs-on: ubuntu-latest
+
+     steps:
+    
+       - name: checkout Repository
+         uses: actions/checkout@v2
+       
+       - name: setup google cloud  CLI
+         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+         env:
+           ACTION_ALLOW_UNSECURE_COMMANDS: true
+         with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+
+       - name: Run helm-chart deployment script
+         run: |
+           chmod +x scripts/secondary-cluster-deployment.sh
+           ./scripts/secondary-cluster-deployment.sh
+         env:
+          CHARTS_PATH: "/"
+
+                   

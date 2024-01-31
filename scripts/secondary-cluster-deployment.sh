@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define variables
-CHARTS_ROOT="/home/juned/Documents/monitering/"  # Replace with the root folder containing all Helm charts
+CHARTS_ROOT="${CHARTS_PATH}"  # Replace with the root folder containing all Helm charts
 NAMESPACE="obf"   # Replace with the Kubernetes namespace
 
 
