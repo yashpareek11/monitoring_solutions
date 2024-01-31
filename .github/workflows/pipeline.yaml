@@ -13,7 +13,7 @@ env:
   IMAGE: secondary-cluster-deployment-image
 
 jobs:
-  setup-helm-deploy
+  setup-helm-deploy:
      name: setup helm deploy
      runs-on: ubuntu-latest
 
