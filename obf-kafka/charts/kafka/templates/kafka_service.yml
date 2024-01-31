@@ -1,0 +1,6 @@
+{{- if .Values.serviceCreate.enable -}}
+ {{ template "kafka.externalservice" . }}
+
+ {{ template "kafka.externalsslservice" . }}
+ 
+{{- end }}

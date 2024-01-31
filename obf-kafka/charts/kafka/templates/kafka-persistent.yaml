@@ -1,0 +1,224 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ include "kafka.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kafka.labels" . | nindent 4 }}
+spec:
+  kafka:
+    version: {{ .Values.spec.kafka.version }}
+    replicas: {{ .Values.spec.kafka.replicas }}
+    template:
+     pod:
+       metadata:
+        {{- with .Values.podAnnotations }}
+        annotations:
+        {{- toYaml . | nindent 11 }}
+        {{- end }} 
+        labels:
+          {{- include "kafka.labels" . | nindent 10 }}
+       {{- with .Values.global.kafka.tolerations }}
+       tolerations:
+        {{- toYaml . | nindent 8 }}
+       {{- end }}
+       {{- with .Values.global.kafka.affinity }}
+       affinity:
+         {{- toYaml . | nindent 8 }}
+       {{- end }}              
+       securityContext:
+        runAsUser: 0
+    resources:
+            {{- toYaml .Values.spec.kafka.resources | nindent 12 }}
+    logging:
+        type: inline
+        loggers:
+          rootLogger.level: "{{ .Values.spec.kafka.config.rootLogger_level }}"
+          log4j.logger.kafka.controller: "{{ .Values.spec.kafka.config.logger_kafka_controller }}"
+    listeners:
+      - name: {{ .Values.spec.kafka.listeners.plain.name }}
+        port: {{ .Values.spec.kafka.listeners.plain.port }}
+        type: {{ .Values.spec.kafka.listeners.plain.type }}
+        tls: {{ .Values.spec.kafka.listeners.plain.tls }}
+      - name: {{ .Values.spec.kafka.listeners.tls.name }}
+        port: {{ .Values.spec.kafka.listeners.tls.port }}
+        type: {{ .Values.spec.kafka.listeners.tls.type }}
+        tls: {{ .Values.spec.kafka.listeners.tls.tls }}
+        configuration:
+         brokerCertChainAndKey: 
+           secretName: {{ include "kafka.fullname" . }}-certificate
+           certificate: kafka.crt
+           key: kafka.key
+      - name: {{ .Values.spec.kafka.listeners.external.name }}
+        type: {{ .Values.spec.kafka.listeners.external.type }}
+        port: {{ .Values.spec.kafka.listeners.external.port }}
+        tls: {{ .Values.spec.kafka.listeners.external.tls }}
+        configuration: 
+          brokers:
+          {{ template "external.nodeport" . }}
+      - name: {{ .Values.spec.kafka.listeners.externalssl.name }}
+        type: {{ .Values.spec.kafka.listeners.externalssl.type }}
+        tls: {{ .Values.spec.kafka.listeners.externalssl.tls }}
+        port: {{ .Values.spec.kafka.listeners.externalssl.port }}
+        configuration:
+         brokerCertChainAndKey: 
+           secretName: {{ include "kafka.fullname" . }}-certificate
+           certificate: kafka.crt
+           key: kafka.key
+         brokers:
+          {{ template "externalssl.nodeport" . }}
+    config:
+      offsets.topic.replication.factor: {{ .Values.spec.kafka.config.offsetsfactor}}
+      transaction.state.log.replication.factor: {{ .Values.spec.kafka.config.transactionfactor}}
+      transaction.state.log.min.isr: {{ .Values.spec.kafka.config.transactionisr }}
+      log.message.format.version: "{{ .Values.spec.kafka.config.logversion }}"
+      default.replication.factor: {{ .Values.spec.kafka.config.replicationFactor }}
+      log.retention.ms: {{ .Values.spec.kafka.config.retentionMs }}
+      log.segment.bytes: {{ .Values.spec.kafka.config.segmentBytes }}
+      num.partitions: {{ .Values.spec.kafka.config.partitions }}
+      max.message.bytes: {{ .Values.spec.kafka.config.MAX_MESSAGE_BYTES }}
+      socket.request.max.bytes: {{ .Values.spec.kafka.config.SOCKET_REQUEST_MAX_BYTES }}
+      message.max.bytes: {{ .Values.spec.kafka.config.MESSAGE_MAX_BYTES }}
+      ssl.enabled.protocols: "{{ .Values.spec.kafka.config.ssl_enabled_protocols }}"
+      ssl.protocol: "{{ .Values.spec.kafka.config.ssl_protocols }}"
+      delete.topic.enable: {{ .Values.spec.kafka.config.delete_topic_enable }}
+      log.retention.check.interval.ms: {{ .Values.spec.kafka.config.log_retention_check_interval_ms }}
+      compression.type: "{{ .Values.spec.kafka.config.compression_type }}"
+      controlled.shutdown.enable: {{ .Values.spec.kafka.config.controlled_shutdown_enable }}
+      num.recovery.threads.per.data.dir: {{ .Values.spec.kafka.config.num_recovery_threads_per_data_dir }}
+      replica.socket.receive.buffer.bytes: {{ .Values.spec.kafka.config.replica_socket_receive_buffer_bytes }}
+      replica.socket.timeout.ms: {{ .Values.spec.kafka.config.replica_socket_timeout_ms }}
+      log.cleaner.delete.retention.ms: {{ .Values.spec.kafka.config.log_cleaner_delete_retention_ms }}
+      request.timeout.ms: {{ .Values.spec.kafka.config.request_timeout_ms }}
+      zookeeper.connection.timeout.ms: {{ .Values.spec.kafka.config.zookeeper_connection_timeout_ms }}
+      inter.broker.protocol.version: "{{ .Values.spec.kafka.config.inter_broker_protocol_version }}"
+      min.insync.replicas: {{ .Values.spec.kafka.config.min_insync_replicas }}
+      num.network.threads: {{ .Values.spec.kafka.config.num_network_threads }}
+      num.io.threads: {{ .Values.spec.kafka.config.num_io_threads }}
+    readinessProbe:
+      initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+      periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+      failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+      timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+    livenessProbe:
+      initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+      periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+      failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+      timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+    jvmOptions:
+      -Xms: {{ .Values.jvmOptions.Xms }}
+      -Xmx: {{ .Values.jvmOptions.Xmx }}
+    storage:
+      type: jbod
+      volumes:
+        {{ template "kafka.storagevolumes" . }}
+    metricsConfig:
+      type: {{ .Values.metricsConfig.type }}
+      valueFrom:
+        configMapKeyRef:
+          name: {{ include "kafka.fullname" . }}-metrics
+          key: {{ .Values.metricsConfig.kafkaKey }}
+  {{- if .Values.kafkaExporterService.enable }}
+  kafkaExporter:
+    groupRegex: ".*" 
+    topicRegex: ".*" 
+    resources: 
+      requests:
+        cpu: {{ .Values.spec.exporter.resources.requests.cpu }}
+        memory: {{ .Values.spec.exporter.resources.requests.memory }}
+      limits:
+        cpu: {{ .Values.spec.exporter.resources.limits.cpu }}
+        memory: {{ .Values.spec.exporter.resources.limits.memory }}
+    logging: {{ .Values.spec.exporter.logging }} 
+    enableSaramaLogging: {{ .Values.spec.exporter.enableSaramaLogging }} 
+    template: 
+      service:
+        metadata:
+          labels:
+            label1: {{ .Values.spec.exporter.template.service.metadata.labels.label1 }}
+            label2: {{ .Values.spec.exporter.template.service.metadata.labels.label2 }}
+            {{- include "kafka.labels" . | nindent 12 }}            
+          annotations:
+            annotation1: {{ .Values.spec.exporter.template.service.metadata.annotations.annotation1 }}
+            annotation2: {{ .Values.spec.exporter.template.service.metadata.annotations.annotation2 }}    
+      pod:
+        metadata:
+          labels:
+            label1: {{ .Values.spec.exporter.pod.metadata.labels.label1 }}
+            {{- include "kafka.labels" . | nindent 12 }}            
+        imagePullSecrets:
+          - name: {{ .Values.spec.exporter.pod.imagePullSecrets.name }}
+        {{- with .Values.global.exporter.tolerations }}
+        tolerations:
+         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.global.exporter.affinity }}
+        affinity:
+         {{- toYaml . | nindent 9 }}
+        {{- end }}
+        securityContext:
+          runAsUser: {{ .Values.spec.exporter.pod.securityContext.runAsUser }}
+          fsGroup: {{ .Values.spec.exporter.pod.securityContext.fsGroup }}
+        terminationGracePeriodSeconds: {{ .Values.spec.exporter.pod.terminationGracePeriodSeconds }}  
+    readinessProbe: 
+      initialDelaySeconds: {{ .Values.spec.exporter.readinessProbe.initialDelaySeconds }}
+      timeoutSeconds: {{ .Values.spec.exporter.readinessProbe.timeoutSeconds }}
+    livenessProbe: 
+      initialDelaySeconds: {{ .Values.spec.exporter.livenessProbe.initialDelaySeconds }}
+      timeoutSeconds: {{ .Values.spec.exporter.livenessProbe.timeoutSeconds }} 
+  {{- end }}   
+  zookeeper:
+    replicas: {{ .Values.spec.zookeeper.replicas }}
+    template:
+     pod:
+       metadata:
+        {{- with .Values.podAnnotations }}
+        annotations:
+        {{- toYaml . | nindent 11 }}
+        {{- end }}
+        labels:
+          {{- include "kafka.labels" . | nindent 10 }}
+       {{- with .Values.global.zookeeper.tolerations }}
+       tolerations:
+        {{- toYaml . | nindent 8 }}
+       {{- end }}
+       {{- with .Values.global.zookeeper.affinity }}
+       affinity:
+        {{- toYaml . | nindent 8 }}
+       {{- end }}        
+       securityContext:
+        runAsUser: 0
+    resources:
+            {{- toYaml .Values.spec.zookeeper.resources | nindent 12 }}
+    storage:
+      class: {{ .Values.spec.zookeeper.storage.class }}
+      type: {{ .Values.spec.zookeeper.storage.type }}
+      size: {{ .Values.spec.zookeeper.storage.size }}
+      deleteClaim: {{ .Values.spec.zookeeper.storage.deleteClaim }}
+    metricsConfig:
+      type: {{ .Values.metricsConfig.type }}
+      valueFrom:
+        configMapKeyRef:
+          name: {{ include "kafka.fullname" . }}-metrics
+          key: {{ .Values.metricsConfig.zookeeperKey }}
+  entityOperator:
+    template:
+     pod:
+       metadata:
+        {{- with .Values.podAnnotations }}
+        annotations:
+        {{- toYaml . | nindent 11 }}
+        {{- end }}
+        labels:
+          {{- include "kafka.labels" . | nindent 10 }}
+       {{- with .Values.global.entityOperator.affinity }} 
+       affinity:
+         {{- toYaml . | nindent 8 }}
+       {{- end }}       
+       {{- with .Values.global.entityOperator.tolerations }}
+       tolerations:
+        {{- toYaml . | nindent 8 }}    
+       {{- end }}  
+    topicOperator: {}
+    userOperator: {}
+        

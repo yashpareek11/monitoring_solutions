@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  labels:
+    name: prometheus-server
+data:
+  prometheus.rules: |-
+    groups:
+    - name: devops rules
+      rules:
+      - alert: High Pod Memory
+        expr: sum(container_memory_usage_bytes) > 1
+        for: 1m
+        labels:
+          severity: slack
+        annotations:
+          summary: High Memory Usage
+  prometheus.yml: |-
+    global:
+    rule_files:
+      - /etc/prometheus/prometheus.rules
+
+    scrape_configs:
+      - job_name: 'kubernetes-pods'
+
+        scrape_interval: 20s
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names:
+               - "default"  
+
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_label_prometheus]
+          action: replace
+          target_label: kubernetes_pod_name
+        - source_labels: [kubernetes_pod_name]
+          action: replace          
+          regex: (.+)
+          replacement: /apis/$1/metrics
+          target_label: __metrics_path__
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:3000
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+
+      - job_name: 'fluentbit'
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+        honor_labels: true
+        static_configs:
+          - targets: ['34.100.153.97:9100']
+          
+      - job_name: 'product'
+        metrics_path: '/apis/product/metrics'
+        scrape_interval: 10s
+        honor_labels: true
+        static_configs:
+          - targets: ['10.170.0.12:80'] 
+          
+      - job_name: 'auth'
+        metrics_path: '/apis/auth/metrics'
+        scrape_interval: 10s
+        honor_labels: true
+        static_configs:
+          - targets: ['10.160.0.16:80']
+
+      - job_name: 'lending'
+        metrics_path: '/apis/lending/metrics'
+        scrape_interval: 10s
+        honor_labels: true
+        static_configs:
+          - targets: ['10.160.0.16:80']

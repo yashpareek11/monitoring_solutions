@@ -1,0 +1,193 @@
+{{- if .Values.persistentVolume.enabled -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol1
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  - {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath1.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol2
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  - {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath2.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol3
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  - {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath3.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol4
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  - {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath4.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol5
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  - {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath5.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol6
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath6.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol7
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath7.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol8
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath8.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol9
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath9.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol10
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath10.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol11
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath11.path }}
+--- 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strimzi-vol12
+  namespace: {{ .Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+  accessModes:
+  -  {{ .Values.persistentVolume.spec.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.reclaimPolicy }}
+  volumeMode: {{ .Values.persistentVolume.spec.volumeMode }}
+  storageClassName: {{ .Values.persistentVolume.spec.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistentVolume.spec.hostPath12.path }}
+  {{- end }}

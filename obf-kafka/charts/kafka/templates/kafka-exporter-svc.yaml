@@ -1,0 +1,22 @@
+{{- if .Values.kafkaExporterService.enable -}}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "kafka.fullname" . }}-exporter
+  namespace: {{ .Release.Namespace }}
+  labels:
+    label1: value1
+{{- with .Values.podAnnotations }}
+  annotations:
+        {{- toYaml . | nindent 8 }}
+{{- end }}
+spec:
+  selector:
+    label1: value1
+  type: {{ .Values.kafkaExporterService.spec.type }}
+  ports:
+    - port: {{ .Values.kafkaExporterService.spec.port }}
+      name: {{ .Values.kafkaExporterService.spec.portname }}
+      nodePort: 
+      
+{{- end }}
